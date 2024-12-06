@@ -1,0 +1,88 @@
+name: Feature
+description: Create a new feature issue
+title: "[FEATURE] "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature issue!
+  
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is this feature for?
+      options:
+        - Backend Services
+        - Frontend (Mobile)
+        - Frontend (Web)
+        - Database
+        - Infrastructure
+        - Authentication
+        - Testing
+        - Documentation
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Development Environment
+      description: Which environment does this feature target?
+      options:
+        - Local Development
+        - Serverless/Cloud
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Provide a clear and concise description of the feature
+      placeholder: As a [user type], I want to [action] so that [benefit]
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List the requirements that must be met for this feature to be complete
+      placeholder: |
+        - [ ] Criteria 1
+        - [ ] Criteria 2
+        - [ ] Criteria 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Details
+      description: Any technical details or architecture considerations
+      placeholder: |
+        - Dependencies:
+        - API Changes:
+        - Database Changes:
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the feature here
+    validations:
+      required: false
+
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Which milestone/sprint is this feature part of?
+      placeholder: e.g., MVP, Sprint 1, Q2 2024
+    validations:
+      required: false

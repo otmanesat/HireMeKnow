@@ -1,0 +1,112 @@
+# Project Overview
+A comprehensive mobile application platform designed to streamline the job application process by combining traditional CV submissions with innovative skills assessment surveys. The platform uses intelligent matching algorithms to connect job seekers with relevant opportunities.
+
+## Technology Stack
+- Frontend: React Native (Mobile App)
+- Web Platform: Next.js
+- Styling: TailwindCSS
+- Icons: Lucid Icons
+- Backend: Serverless Architecture
+- CI/CD: GitHub Actions
+
+## Core Functionalities
+
+### User Features
+1. CV Management
+   - Upload and manage CVs in multiple formats (PDF, DOCX)
+   - CV parsing and standardization
+   - Smart CV analysis and scoring
+
+2. Skills Assessment
+   - Interactive surveys and questionnaires
+   - Skill-based evaluations
+   - Personality and work preference assessments
+   - Real-time progress tracking
+
+3. Job Matching
+   - AI-powered job recommendations
+   - Skills-to-job opportunity mapping
+   - Match percentage indicators
+   - Customized job alerts
+
+4. Job Applications
+   - Detailed job listings view
+   - One-click application process
+   - Application status tracking
+   - Direct employer communication
+
+5. User Profile
+   - Professional profile management
+   - Skills portfolio
+   - Work history
+   - Preferences settings
+   - Achievement tracking
+
+### User Roles
+1. Job Seekers
+   - Basic users (CV upload only)
+   - Premium users (Full features access)
+
+2. Employers
+   - Job posting management
+   - Candidate screening
+   - Application review
+
+3. Recruiters
+   - Candidate search
+   - Interview scheduling
+   - Application processing
+
+4. Administrators
+   - Platform management
+   - User management
+   - Content moderation
+
+## Architecture Overview
+- Mobile-first approach
+- Serverless backend architecture
+- Microservices-based design
+- Real-time notification system
+- Secure authentication and authorization
+- Data encryption and privacy compliance
+
+## Development Phases
+1. Planning & Design
+   - UX/UI design
+   - Technical architecture
+   - Security planning
+
+2. Core Development
+   - User authentication
+   - CV management system
+   - Survey engine
+   - Job matching algorithm
+
+3. Enhanced Features
+   - Real-time notifications
+   - Advanced analytics
+   - Integration with job boards
+   - Premium features
+
+4. Testing & Deployment
+   - Unit testing
+   - Integration testing
+   - User acceptance testing
+   - Production deployment
+
+## Current File Structure
+
+## Documentation
+Comprehensive documentation is maintained in the following categories:
+- Technical Documentation
+- API Documentation
+- User Guides
+- Development Guidelines
+- Deployment Procedures
+- Security Protocols
+
+## Roadmap
+- Phase 1: MVP Release (Q2 2024)
+- Phase 2: Enhanced Features (Q3 2024)
+- Phase 3: Enterprise Integration (Q4 2024)
+- Phase 4: International Expansion (Q1 2025)

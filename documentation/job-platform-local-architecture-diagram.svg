@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect x="50" y="50" width="700" height="500" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+  
+  <!-- Docker Container Representation -->
+  <rect x="100" y="100" width="600" height="400" fill="#2196F3" fill-opacity="0.1" stroke="#2196F3" stroke-dasharray="5,5"/>
+  <text x="400" y="130" text-anchor="middle" fill="#2196F3" font-weight="bold">Docker Development Environment</text>
+  
+  <!-- Services -->
+  <rect x="150" y="170" width="150" height="80" fill="#4CAF50" stroke="#333"/>
+  <text x="225" y="210" text-anchor="middle" fill="white">User Service</text>
+  
+  <rect x="350" y="170" width="150" height="80" fill="#FF9800" stroke="#333"/>
+  <text x="425" y="210" text-anchor="middle" fill="white">Job Matching Service</text>
+  
+  <rect x="550" y="170" width="150" height="80" fill="#9C27B0" stroke="#333"/>
+  <text x="625" y="210" text-anchor="middle" fill="white">Profile Service</text>
+  
+  <!-- Databases -->
+  <rect x="250" y="300" width="150" height="80" fill="#FF5722" stroke="#333"/>
+  <text x="325" y="340" text-anchor="middle" fill="white">PostgreSQL</text>
+  
+  <rect x="500" y="300" width="150" height="80" fill="#673AB7" stroke="#333"/>
+  <text x="575" y="340" text-anchor="middle" fill="white">Redis Cache</text>
+  
+  <!-- Mobile App -->
+  <rect x="350" y="450" width="150" height="80" fill="#03A9F4" stroke="#333"/>
+  <text x="425" y="490" text-anchor="middle" fill="white">Mobile App</text>
+  
+  <!-- Connections -->
+  <line x1="225" y1="250" x2="425" y2="450" stroke="#333" stroke-dasharray="5,5"/>
+  <line x1="425" y1="250" x2="425" y2="450" stroke="#333" stroke-dasharray="5,5"/>
+  <line x1="625" y1="250" x2="425" y2="450" stroke="#333" stroke-dasharray="5,5"/>
+</svg>

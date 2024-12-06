@@ -1,0 +1,89 @@
+```yaml
+name: Task
+description: Create a new task
+title: "[TASK] "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create a new development task
+  
+  - type: input
+    id: parent-issue
+    attributes:
+      label: Parent Feature/Issue
+      description: Link to the parent feature or issue this task belongs to
+      placeholder: "#123"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Task priority level
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Detailed description of what needs to be done
+      placeholder: Implement the database abstraction layer for local PostgreSQL support...
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-details
+    attributes:
+      label: Implementation Details
+      description: Technical details and steps for implementation
+      placeholder: |
+        1. Create DatabaseClient interface
+        2. Implement PostgreSQL client
+        3. Add connection pooling
+        4. Implement CRUD operations
+    validations:
+      required: true
+
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: Definition of Done
+      description: Checklist of items that must be completed
+      placeholder: |
+        - [ ] Code implemented
+        - [ ] Tests written
+        - [ ] Documentation updated
+        - [ ] Code reviewed
+    validations:
+      required: true
+
+  - type: input
+    id: estimated-time
+    attributes:
+      label: Estimated Time
+      description: Estimated time to complete this task
+      placeholder: "e.g., 4h, 2d"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Which environment does this task target?
+      options:
+        - Local Development
+        - Serverless/Cloud
+        - Both
+    validations:
+      required: true
+``` 
+</rewritten_file>
