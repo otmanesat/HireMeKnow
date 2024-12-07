@@ -1,4 +1,16 @@
 import dotenv from 'dotenv';
+import { register } from 'tsconfig-paths';
+
+// Register TypeScript path aliases
+register({
+  baseUrl: './src',
+  paths: {
+    '@core/*': ['core/*'],
+    '@infrastructure/*': ['infrastructure/*'],
+    '@services/*': ['services/*'],
+    '@utils/*': ['utils/*']
+  }
+});
 
 // Load test environment variables
 dotenv.config({ path: '.env.test' });
