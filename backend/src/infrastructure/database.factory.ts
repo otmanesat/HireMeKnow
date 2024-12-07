@@ -7,6 +7,7 @@ export class DatabaseClientFactory {
     switch (environment) {
       case 'local':
       case 'development':
+      case 'test':
         return new PostgresqlClient(config);
       case 'production':
       case 'staging':
