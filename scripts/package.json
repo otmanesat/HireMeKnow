@@ -1,0 +1,16 @@
+{
+  "name": "hiremknow-github-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for managing HireMeKnow GitHub project",
+  "private": true,
+  "scripts": {
+    "create-issues": "node create-issues.js",
+    "check-env": "node check-environment.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.13",
+    "js-yaml": "^4.1.0",
+    "marked": "^9.1.5",
+    "dotenv": "^16.3.1"
+  }
+} 

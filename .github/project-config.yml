@@ -1,246 +1,110 @@
-# Project Board Configuration
-name: HireMeKnow Development
-description: HireMeKnow mobile application development project board
+name: "HireMeKnow Development"
+description: "Mobile application development project board"
 
-# Custom Fields
 fields:
-  - name: Status
-    type: single-select
+  - name: "Status"
+    type: "single-select"
     options:
-      - label: 🆕 New
-        color: "0366d6"
-      - label: 📋 Backlog
-        color: "d4c5f9"
-      - label: 🎯 Sprint Backlog
-        color: "bfdadc"
-      - label: ⏳ In Progress
-        color: "fbca04"
-      - label: 👀 In Review
-        color: "1d76db"
-      - label: ✅ Done
-        color: "0e8a16"
-      - label: 🚫 Blocked
-        color: "b60205"
+      - label: "🆕 New"
+        color: "BLUE"
+      - label: "📋 Backlog"
+        color: "PURPLE"
+      - label: "🎯 Sprint Backlog"
+        color: "GREEN"
+      - label: "⏳ In Progress"
+        color: "YELLOW"
+      - label: "👀 In Review"
+        color: "ORANGE"
+      - label: "✅ Done"
+        color: "GREEN"
+      - label: "🚫 Blocked"
+        color: "RED"
 
-  - name: Priority
-    type: single-select
+  - name: "Priority"
+    type: "single-select"
     options:
-      - label: 🔥 High
-        color: "d93f0b"
-      - label: 📌 Medium
-        color: "fbca04"
-      - label: 📎 Low
-        color: "0e8a16"
+      - label: "🔥 High"
+        color: "RED"
+      - label: "📌 Medium"
+        color: "YELLOW"
+      - label: "📎 Low"
+        color: "GREEN"
 
-  - name: Type
-    type: single-select
+  - name: "Type"
+    type: "single-select"
     options:
-      - label: 🎯 Feature
-        color: "0075ca"
-      - label: 🐛 Bug
-        color: "d73a4a"
-      - label: 📝 Documentation
-        color: "0075ca"
-      - label: 🔧 Technical Debt
-        color: "ff7619"
-      - label: 🔒 Security
-        color: "d4c5f9"
+      - label: "🎯 Feature"
+        color: "BLUE"
+      - label: "🐛 Bug"
+        color: "RED"
+      - label: "📝 Documentation"
+        color: "PURPLE"
+      - label: "🔧 Technical Debt"
+        color: "ORANGE"
+      - label: "🔒 Security"
+        color: "GREEN"
 
-  - name: Effort
-    type: single-select
+  - name: "Estimate"
+    type: "single-select"
     options:
-      - label: 🐜 XS (1-2 days)
-        color: "bfdadc"
-      - label: 🐭 S (3-5 days)
-        color: "c2e0c6"
-      - label: 🦊 M (1-2 weeks)
-        color: "fbca04"
-      - label: 🦌 L (2-4 weeks)
-        color: "d93f0b"
-      - label: 🐘 XL (1+ months)
-        color: "b60205"
+      - label: "🐜 XS (1-2 days)"
+        color: "GREEN"
+      - label: "🐭 S (3-5 days)"
+        color: "BLUE"
+      - label: "🦊 M (1-2 weeks)"
+        color: "YELLOW"
+      - label: "🦌 L (2-4 weeks)"
+        color: "ORANGE"
+      - label: "🐘 XL (1+ months)"
+        color: "RED"
 
-# Views
+  - name: "Sprint"
+    type: "iteration"
+
+  - name: "Target Date"
+    type: "date"
+
 views:
-  - name: Kanban Board
-    type: board
-    fields:
-      - Status
-    configuration:
-      groupBy: Status
-      sortBy: Priority
+  - name: "Main View"
+  - name: "Timeline View"
 
-  - name: Roadmap
-    type: roadmap
-    fields:
-      - Status
-      - Type
-      - Priority
-    configuration:
-      groupBy: Type
-      sortBy: Priority
-
-  - name: Sprint Planning
-    type: table
-    fields:
-      - Status
-      - Type
-      - Priority
-      - Effort
-    configuration:
-      groupBy: Status
-      sortBy: Priority
-
-# Enhanced Automations
-automations:
-  # Issue Management
-  - name: Auto-assign to project
-    events: [issues.opened, pull_request.opened]
-    actions:
-      - type: add_to_project
-        status: 🆕 New
-
-  - name: Auto-label by title
-    events: [issues.opened]
-    conditions:
-      - if: title.startsWith('[FEATURE]')
-        then:
-          - type: add_labels
-            labels: ['feature']
-      - if: title.startsWith('[BUG]')
-        then:
-          - type: add_labels
-            labels: ['bug']
-      - if: title.startsWith('[TASK]')
-        then:
-          - type: add_labels
-            labels: ['task']
-
-  - name: Auto-assign priority
-    events: [issues.labeled]
-    conditions:
-      - if: labels.includes('bug')
-        then:
-          - type: set_field
-            field: Priority
-            value: 🔥 High
-
-  # PR Workflow
-  - name: Move to In Progress
-    events: [pull_request.opened]
-    actions:
-      - type: set_status
-        status: ⏳ In Progress
-      - type: add_labels
-        labels: ['in-progress']
-
-  - name: Move to Review
-    events: [pull_request.ready_for_review]
-    actions:
-      - type: set_status
-        status: 👀 In Review
-      - type: add_labels
-        labels: ['needs-review']
-
-  - name: Mark as Done
-    events: [pull_request.merged]
-    actions:
-      - type: set_status
-        status: ✅ Done
-      - type: remove_labels
-        labels: ['in-progress', 'needs-review']
-      - type: add_labels
-        labels: ['completed']
-
-  # Issue Dependencies
-  - name: Auto-block dependent issues
-    events: [issues.labeled]
-    conditions:
-      - if: labels.includes('blocked')
-        then:
-          - type: set_status
-            status: 🚫 Blocked
-
-  - name: Auto-unblock resolved dependencies
-    events: [issues.unblocked]
-    actions:
-      - type: set_status
-        status: 📋 Backlog
-      - type: remove_labels
-        labels: ['blocked']
-
-  # Stale Issue Management
-  - name: Mark stale issues
-    schedule: daily
-    conditions:
-      - if: issue.updatedAt < (now - 30d)
-        then:
-          - type: add_labels
-            labels: ['stale']
-          - type: comment
-            body: This issue has been marked as stale due to 30 days of inactivity.
-
-  # Review Reminders
-  - name: Review reminder
-    schedule: daily
-    conditions:
-      - if: status == '👀 In Review' && updatedAt < (now - 2d)
-        then:
-          - type: comment
-            body: This PR has been in review for over 2 days. Please review or update status.
-
-  # Sprint Management
-  - name: Sprint Planning
-    schedule: weekly
-    actions:
-      - type: move_to_sprint
-        status: 🎯 Sprint Backlog
-        conditions:
-          - priority: 🔥 High
-          - not_labeled: blocked
-
-# Labels
 labels:
-  - name: feature
+  - name: "feature"
     color: "0075ca"
-    description: New feature or enhancement
+    description: "New feature or enhancement"
   
-  - name: bug
+  - name: "bug"
     color: "d73a4a"
-    description: Something isn't working
+    description: "Something isn't working"
   
-  - name: documentation
+  - name: "documentation"
     color: "0075ca"
-    description: Documentation updates
+    description: "Documentation updates"
   
-  - name: technical-debt
+  - name: "technical-debt"
     color: "ff7619"
-    description: Technical improvements and refactoring
+    description: "Technical improvements and refactoring"
   
-  - name: security
+  - name: "security"
     color: "d4c5f9"
-    description: Security-related issues
+    description: "Security-related issues"
   
-  - name: blocked
+  - name: "blocked"
     color: "b60205"
-    description: Blocked by another issue or external factor
+    description: "Blocked by another issue or external factor"
   
-  - name: good-first-issue
+  - name: "good-first-issue"
     color: "7057ff"
-    description: Good for newcomers
-  
-  - name: in-progress
-    color: "fbca04"
-    description: Currently being worked on
-  
-  - name: needs-review
+    description: "Good for newcomers"
+
+  - name: "high-priority"
+    color: "d93f0b"
+    description: "Urgent attention needed"
+
+  - name: "needs-review"
     color: "1d76db"
-    description: Ready for review
-  
-  - name: completed
-    color: "0e8a16"
-    description: Task completed
-  
-  - name: stale
-    color: "d4c5f9"
-    description: No activity for 30 days
+    description: "Ready for review"
+
+  - name: "in-progress"
+    color: "fbca04"
+    description: "Currently being worked on"
