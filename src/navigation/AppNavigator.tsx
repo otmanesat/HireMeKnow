@@ -1,26 +1,18 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { HomeScreen } from '../screens/HomeScreen';
+import { useAuth } from '../hooks/useAuth';
+import { AuthNavigator } from './AuthNavigator';
+import { MainNavigator } from './MainNavigator';
 
-export type RootStackParamList = {
-  Home: undefined;
-};
-
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator();
 
 export const AppNavigator: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen}
-          options={{
-            title: 'HireMeKnow',
-          }}
-        />
-      </Stack.Navigator>
+      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 }; 

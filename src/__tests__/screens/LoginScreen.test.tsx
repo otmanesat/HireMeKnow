@@ -13,9 +13,10 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 // Mock useAuth hook
+const mockLogin = jest.fn();
 jest.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
-    login: jest.fn(),
+    login: mockLogin,
     isLoading: false,
     error: null,
   }),
@@ -71,7 +72,7 @@ describe('LoginScreen', () => {
     fireEvent.press(loginButton);
 
     await waitFor(() => {
-      expect(require('../../hooks/useAuth').useAuth().login).toHaveBeenCalledWith({
+      expect(mockLogin).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'password123',
       });
@@ -82,11 +83,13 @@ describe('LoginScreen', () => {
     const mockError = 'Invalid credentials';
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    (require('../../hooks/useAuth').useAuth as jest.Mock).mockReturnValue({
-      login: jest.fn(),
-      isLoading: false,
-      error: mockError,
-    });
+    jest.mock('../../hooks/useAuth', () => ({
+      useAuth: () => ({
+        login: mockLogin,
+        isLoading: false,
+        error: mockError,
+      }),
+    }));
 
     const { getByText } = render(
       <Provider store={store}>
@@ -100,11 +103,13 @@ describe('LoginScreen', () => {
   });
 
   it('shows loading state during login', async () => {
-    (require('../../hooks/useAuth').useAuth as jest.Mock).mockReturnValue({
-      login: jest.fn(),
-      isLoading: true,
-      error: null,
-    });
+    jest.mock('../../hooks/useAuth', () => ({
+      useAuth: () => ({
+        login: mockLogin,
+        isLoading: true,
+        error: null,
+      }),
+    }));
 
     const { getByText } = render(
       <Provider store={store}>
