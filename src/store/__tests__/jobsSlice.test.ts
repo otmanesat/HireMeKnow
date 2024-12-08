@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import jobsReducer, { fetchJobs } from '../slices/jobsSlice';
+import type { Store } from '@reduxjs/toolkit';
 
 describe('Jobs Slice', () => {
-  let store;
+  let store: Store;
 
   beforeEach(() => {
     store = configureStore({
@@ -12,7 +13,7 @@ describe('Jobs Slice', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve([]),
-      })
+      } as Response)
     );
   });
 
@@ -22,7 +23,7 @@ describe('Jobs Slice', () => {
       global.fetch = jest.fn().mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockJobs),
-      });
+      } as Response);
 
       await store.dispatch(fetchJobs({}));
       
@@ -50,7 +51,7 @@ describe('Jobs Slice', () => {
       global.fetch = jest.fn().mockResolvedValueOnce({
         ok: false,
         status: 500,
-      });
+      } as Response);
 
       await store.dispatch(fetchJobs({}));
       

@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import type { Store } from '@reduxjs/toolkit';
 import { AppNavigator } from '../AppNavigator';
 import authReducer from '../../store/slices/authSlice';
 
@@ -51,7 +52,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 describe('Navigation System', () => {
-  let store;
+  let store: Store;
 
   beforeEach(() => {
     store = configureStore({

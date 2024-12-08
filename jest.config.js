@@ -6,7 +6,7 @@ module.exports = {
     '<rootDir>/jest.setup.js'
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|@rneui|react-native-reanimated|react-native-size-matters|react-native-gesture-handler)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|@rneui|react-native-reanimated|react-native-size-matters|react-native-gesture-handler|react-native-safe-area-context)/)',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -28,7 +28,7 @@ module.exports = {
       statements: 80,
     },
   },
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   testPathIgnorePatterns: [
     '/node_modules/',
     '/e2e/',
@@ -36,10 +36,17 @@ module.exports = {
   globals: {
     'ts-jest': {
       isolatedModules: true,
+      tsconfig: {
+        jsx: 'react',
+      },
     },
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
   moduleDirectories: ['node_modules', 'src'],
+  testMatch: [
+    '**/__tests__/**/*.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[jt]s?(x)'
+  ],
 }; 

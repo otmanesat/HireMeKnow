@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import type { Store } from '@reduxjs/toolkit';
 import { LoginScreen } from '../../screens/Auth/LoginScreen';
 import authReducer from '../../store/slices/authSlice';
 
@@ -14,11 +15,14 @@ jest.mock('@react-navigation/native', () => ({
 
 // Mock useAuth hook
 const mockLogin = jest.fn();
+let mockIsLoading = false;
+let mockError: string | null = null;
+
 jest.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     login: mockLogin,
-    isLoading: false,
-    error: null,
+    isLoading: mockIsLoading,
+    error: mockError,
   }),
 }));
 
@@ -33,7 +37,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 describe('LoginScreen', () => {
-  let store;
+  let store: Store;
 
   beforeEach(() => {
     store = configureStore({
@@ -42,6 +46,8 @@ describe('LoginScreen', () => {
       },
     });
     jest.clearAllMocks();
+    mockIsLoading = false;
+    mockError = null;
   });
 
   it('renders login form correctly', () => {
@@ -80,16 +86,8 @@ describe('LoginScreen', () => {
   });
 
   it('shows error message when login fails', async () => {
-    const mockError = 'Invalid credentials';
+    mockError = 'Invalid credentials';
     jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    jest.mock('../../hooks/useAuth', () => ({
-      useAuth: () => ({
-        login: mockLogin,
-        isLoading: false,
-        error: mockError,
-      }),
-    }));
 
     const { getByText } = render(
       <Provider store={store}>
@@ -98,18 +96,12 @@ describe('LoginScreen', () => {
     );
 
     await waitFor(() => {
-      expect(getByText(mockError)).toBeTruthy();
+      expect(getByText('Invalid credentials')).toBeTruthy();
     });
   });
 
   it('shows loading state during login', async () => {
-    jest.mock('../../hooks/useAuth', () => ({
-      useAuth: () => ({
-        login: mockLogin,
-        isLoading: true,
-        error: null,
-      }),
-    }));
+    mockIsLoading = true;
 
     const { getByText } = render(
       <Provider store={store}>
