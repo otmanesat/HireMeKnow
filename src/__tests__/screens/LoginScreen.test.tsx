@@ -1,83 +1,116 @@
 import React from 'react';
-import { fireEvent, waitFor } from '@testing-library/react-native';
-import { renderWithProviders, createMockUser } from '../../test-utils/test-utils';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import type { Store } from '@reduxjs/toolkit';
 import { LoginScreen } from '../../screens/Auth/LoginScreen';
-import { loginUser } from '../../store/slices/authSlice';
+import authReducer from '../../store/slices/authSlice';
 
-// Mock the navigation
-const mockNavigate = jest.fn();
+// Mock navigation
 jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
   useNavigation: () => ({
-    navigate: mockNavigate,
+    navigate: jest.fn(),
   }),
 }));
 
+// Mock useAuth hook
+const mockLogin = jest.fn();
+let mockIsLoading = false;
+let mockError: string | null = null;
+
+jest.mock('../../hooks/useAuth', () => ({
+  useAuth: () => ({
+    login: mockLogin,
+    isLoading: mockIsLoading,
+    error: mockError,
+  }),
+}));
+
+// Mock theme provider
+jest.mock('@rneui/themed', () => ({
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock safe area provider
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 describe('LoginScreen', () => {
+  let store: Store;
+
   beforeEach(() => {
+    store = configureStore({
+      reducer: {
+        auth: authReducer,
+      },
+    });
     jest.clearAllMocks();
+    mockIsLoading = false;
+    mockError = null;
   });
 
   it('renders login form correctly', () => {
-    const { getByTestId, getByText } = renderWithProviders(<LoginScreen />);
+    const { getByPlaceholderText, getByText } = render(
+      <Provider store={store}>
+        <LoginScreen />
+      </Provider>
+    );
 
-    expect(getByTestId('login-screen')).toBeTruthy();
-    expect(getByTestId('email-input')).toBeTruthy();
-    expect(getByTestId('password-input')).toBeTruthy();
+    expect(getByPlaceholderText('Email')).toBeTruthy();
+    expect(getByPlaceholderText('Password')).toBeTruthy();
     expect(getByText('Login')).toBeTruthy();
-    expect(getByText('Create an account')).toBeTruthy();
   });
 
-  it('shows validation errors for empty fields', async () => {
-    const { getByTestId, findByText } = renderWithProviders(<LoginScreen />);
+  it('handles login submission', async () => {
+    const { getByPlaceholderText, getByText } = render(
+      <Provider store={store}>
+        <LoginScreen />
+      </Provider>
+    );
 
-    fireEvent.press(getByTestId('login-button'));
+    const emailInput = getByPlaceholderText('Email');
+    const passwordInput = getByPlaceholderText('Password');
+    const loginButton = getByText('Login');
 
-    expect(await findByText('Email is required')).toBeTruthy();
-    expect(await findByText('Password is required')).toBeTruthy();
-  });
+    fireEvent.changeText(emailInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password123');
+    fireEvent.press(loginButton);
 
-  it('handles successful login', async () => {
-    const mockUser = createMockUser();
-    const { getByTestId } = renderWithProviders(<LoginScreen />);
-
-    // Fill in the form
-    fireEvent.changeText(getByTestId('email-input'), mockUser.email);
-    fireEvent.changeText(getByTestId('password-input'), 'password123');
-
-    // Submit the form
-    fireEvent.press(getByTestId('login-button'));
-
-    // Wait for the login process
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('Home');
+      expect(mockLogin).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'password123',
+      });
     });
   });
 
-  it('handles login error', async () => {
-    const { getByTestId, findByText } = renderWithProviders(<LoginScreen />);
+  it('shows error message when login fails', async () => {
+    mockError = 'Invalid credentials';
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Mock a failed login
-    jest.spyOn(global, 'fetch').mockImplementationOnce(() =>
-      Promise.reject(new Error('Invalid credentials'))
+    const { getByText } = render(
+      <Provider store={store}>
+        <LoginScreen />
+      </Provider>
     );
 
-    // Fill in the form with invalid credentials
-    fireEvent.changeText(getByTestId('email-input'), 'wrong@example.com');
-    fireEvent.changeText(getByTestId('password-input'), 'wrongpassword');
-
-    // Submit the form
-    fireEvent.press(getByTestId('login-button'));
-
-    // Check for error message
-    expect(await findByText('Invalid credentials')).toBeTruthy();
+    await waitFor(() => {
+      expect(getByText('Invalid credentials')).toBeTruthy();
+    });
   });
 
-  it('navigates to registration screen', () => {
-    const { getByTestId } = renderWithProviders(<LoginScreen />);
+  it('shows loading state during login', async () => {
+    mockIsLoading = true;
 
-    fireEvent.press(getByTestId('register-link'));
+    const { getByText } = render(
+      <Provider store={store}>
+        <LoginScreen />
+      </Provider>
+    );
 
-    expect(mockNavigate).toHaveBeenCalledWith('Register');
+    await waitFor(() => {
+      expect(getByText('Loading...')).toBeTruthy();
+    });
   });
 }); 

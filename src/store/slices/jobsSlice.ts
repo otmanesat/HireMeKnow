@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // Types
 export interface Job {
@@ -43,29 +43,21 @@ const initialState: JobsState = {
 // Async thunks
 export const fetchJobs = createAsyncThunk(
   'jobs/fetchJobs',
-  async (filters: Partial<JobFilters>, { rejectWithValue }) => {
-    try {
-      // TODO: Replace with actual API call
-      const queryParams = new URLSearchParams();
-      if (filters.location) queryParams.append('location', filters.location);
-      if (filters.jobType) queryParams.append('type', filters.jobType);
-      if (filters.salary) queryParams.append('salary', filters.salary.toString());
-      if (filters.searchQuery) queryParams.append('search', filters.searchQuery);
+  async (filters: Partial<JobsState['filters']>) => {
+    const queryParams = new URLSearchParams();
+    if (filters.location) queryParams.append('location', filters.location);
+    if (filters.jobType) queryParams.append('type', filters.jobType);
+    if (filters.salary) queryParams.append('salary', filters.salary.toString());
+    if (filters.searchQuery) queryParams.append('q', filters.searchQuery);
 
-      const response = await fetch(`YOUR_API_URL/jobs?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch jobs');
-      }
+    const API_URL = process.env.API_URL || 'http://localhost:3000';
+    const response = await fetch(`${API_URL}/jobs${queryParams.toString() ? '?' + queryParams.toString() : ''}`);
 
-      const data = await response.json();
-      return data as Job[];
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue('An unknown error occurred');
+    if (!response.ok) {
+      throw new Error('Failed to fetch jobs');
     }
+
+    return response.json();
   }
 );
 
@@ -74,14 +66,14 @@ const jobsSlice = createSlice({
   name: 'jobs',
   initialState,
   reducers: {
-    setFilters: (state, action: PayloadAction<Partial<JobFilters>>) => {
-      state.filters = { ...state.filters, ...action.payload };
+    setFilters: (state, action) => {
+      state.filters = {
+        ...state.filters,
+        ...action.payload,
+      };
     },
     clearFilters: (state) => {
       state.filters = initialState.filters;
-    },
-    clearError: (state) => {
-      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -90,17 +82,16 @@ const jobsSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchJobs.fulfilled, (state, action: PayloadAction<Job[]>) => {
+      .addCase(fetchJobs.fulfilled, (state, action) => {
         state.isLoading = false;
         state.items = action.payload;
-        state.error = null;
       })
       .addCase(fetchJobs.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || 'Failed to fetch jobs';
       });
   },
 });
 
-export const { setFilters, clearFilters, clearError } = jobsSlice.actions;
+export const { setFilters, clearFilters } = jobsSlice.actions;
 export default jobsSlice.reducer; 
