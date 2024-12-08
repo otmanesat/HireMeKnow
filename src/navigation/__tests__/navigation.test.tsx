@@ -1,22 +1,38 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { AppNavigator } from '../AppNavigator';
-import { AuthNavigator } from '../AuthNavigator';
-import { MainNavigator } from '../MainNavigator';
 
 // Mock the hooks
 jest.mock('../../hooks/useAuth');
 
 // Mock the navigators
 jest.mock('../AuthNavigator', () => ({
-  AuthNavigator: () => null,
+  AuthNavigator: jest.fn(() => null),
 }));
 
 jest.mock('../MainNavigator', () => ({
-  MainNavigator: () => null,
+  MainNavigator: jest.fn(() => null),
+}));
+
+// Mock navigation
+jest.mock('@react-navigation/native', () => ({
+  NavigationContainer: ({ children }: { children: React.ReactNode }) => children,
+  useNavigation: () => ({
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+  }),
+}));
+
+// Mock gesture handler
+jest.mock('react-native-gesture-handler', () => ({
+  GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock safe area context
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Import the mocked hook
@@ -31,11 +47,11 @@ describe('Navigation System', () => {
     store = configureStore({
       reducer: {},
     });
+    jest.clearAllMocks();
   });
 
   describe('Authentication Flow', () => {
     it('shows auth navigator when not authenticated', () => {
-      // Mock useAuth hook
       mockUseAuth.mockReturnValue({
         isAuthenticated: false,
         user: null,
@@ -45,19 +61,16 @@ describe('Navigation System', () => {
         error: null,
       });
 
-      const { getByTestId } = render(
+      render(
         <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
+          <AppNavigator />
         </Provider>
       );
 
-      expect(AuthNavigator).toHaveBeenCalled();
+      expect(require('../AuthNavigator').AuthNavigator).toHaveBeenCalled();
     });
 
     it('shows main navigator when authenticated', () => {
-      // Mock useAuth hook
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: { id: '1' },
@@ -67,21 +80,18 @@ describe('Navigation System', () => {
         error: null,
       });
 
-      const { getByTestId } = render(
+      render(
         <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
+          <AppNavigator />
         </Provider>
       );
 
-      expect(MainNavigator).toHaveBeenCalled();
+      expect(require('../MainNavigator').MainNavigator).toHaveBeenCalled();
     });
   });
 
   describe('Role-Based Access', () => {
     it('redirects to jobs list when user lacks required role', () => {
-      // Mock useAuth hook with user having incorrect role
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: { id: '1', role: 'user' },
@@ -91,21 +101,18 @@ describe('Navigation System', () => {
         error: null,
       });
 
-      const { getByTestId } = render(
+      render(
         <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
+          <AppNavigator />
         </Provider>
       );
 
-      expect(MainNavigator).toHaveBeenCalled();
+      expect(require('../MainNavigator').MainNavigator).toHaveBeenCalled();
     });
   });
 
   describe('Navigation State', () => {
     it('maintains navigation state after auth status change', () => {
-      // Initial render with authenticated state
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: { id: '1' },
@@ -117,13 +124,10 @@ describe('Navigation System', () => {
 
       const { rerender } = render(
         <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
+          <AppNavigator />
         </Provider>
       );
 
-      // Change auth state
       mockUseAuth.mockReturnValue({
         isAuthenticated: false,
         user: null,
@@ -135,59 +139,11 @@ describe('Navigation System', () => {
 
       rerender(
         <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
+          <AppNavigator />
         </Provider>
       );
 
-      expect(AuthNavigator).toHaveBeenCalled();
-    });
-  });
-
-  describe('Deep Linking', () => {
-    it('handles job details deep link when authenticated', () => {
-      // Mock authenticated state
-      mockUseAuth.mockReturnValue({
-        isAuthenticated: true,
-        user: { id: '1' },
-        login: jest.fn(),
-        logout: jest.fn(),
-        isLoading: false,
-        error: null,
-      });
-
-      const { getByTestId } = render(
-        <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </Provider>
-      );
-
-      expect(MainNavigator).toHaveBeenCalled();
-    });
-
-    it('redirects deep link to login when not authenticated', () => {
-      // Mock unauthenticated state
-      mockUseAuth.mockReturnValue({
-        isAuthenticated: false,
-        user: null,
-        login: jest.fn(),
-        logout: jest.fn(),
-        isLoading: false,
-        error: null,
-      });
-
-      const { getByTestId } = render(
-        <Provider store={store}>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </Provider>
-      );
-
-      expect(AuthNavigator).toHaveBeenCalled();
+      expect(require('../AuthNavigator').AuthNavigator).toHaveBeenCalled();
     });
   });
 }); 

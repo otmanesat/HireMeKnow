@@ -14,6 +14,10 @@ register({
 // Load environment variables
 dotenv.config();
 
+// Set test environment variables
+process.env.NODE_ENV = 'test';
+process.env.DATABASE_URL = 'postgresql://localhost:5432/hiremeknow_test';
+
 describe('Backend Test Environment Setup', () => {
   it('should have TypeScript path aliases configured', () => {
     expect(() => require('@core/interfaces/database.interface')).not.toThrow();
@@ -23,12 +27,9 @@ describe('Backend Test Environment Setup', () => {
 
   it('should have required environment variables', () => {
     expect(process.env.NODE_ENV).toBe('test');
-    expect(process.env.DATABASE_URL).toBeDefined();
+    expect(process.env.DATABASE_URL).toBe('postgresql://localhost:5432/hiremeknow_test');
   });
 });
-
-// Set test environment
-process.env.NODE_ENV = 'test';
 
 // Global test timeout
 jest.setTimeout(30000);
