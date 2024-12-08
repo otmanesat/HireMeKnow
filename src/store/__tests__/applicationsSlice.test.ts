@@ -9,8 +9,12 @@ import type { Application } from '../slices/applicationsSlice';
 // Mock fetch
 global.fetch = jest.fn();
 
+interface TestStore {
+  applications: ReturnType<typeof applicationsReducer>;
+}
+
 describe('Applications Slice', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: ReturnType<typeof configureStore<TestStore>>;
 
   beforeEach(() => {
     store = configureStore({
@@ -21,8 +25,8 @@ describe('Applications Slice', () => {
 
   describe('Initial State', () => {
     it('should have the correct initial state', () => {
-      const state = store.getState().applications;
-      expect(state).toEqual({
+      const state = store.getState();
+      expect(state.applications).toEqual({
         items: [],
         isLoading: false,
         error: null,
@@ -38,7 +42,7 @@ describe('Applications Slice', () => {
         userId: 'user1',
         status: 'pending',
         appliedDate: '2024-01-08',
-        resume: 'resume.pdf',
+        resume: 'resume1.pdf',
         coverLetter: 'cover-letter.pdf',
       },
     ];
@@ -50,11 +54,11 @@ describe('Applications Slice', () => {
       });
 
       await store.dispatch(fetchApplications('user1'));
-      const state = store.getState().applications;
+      const state = store.getState();
 
-      expect(state.items).toEqual(mockApplications);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(state.applications.items).toEqual(mockApplications);
+      expect(state.applications.isLoading).toBe(false);
+      expect(state.applications.error).toBeNull();
     });
 
     it('should handle fetch failure', async () => {
@@ -63,11 +67,11 @@ describe('Applications Slice', () => {
       });
 
       await store.dispatch(fetchApplications('user1'));
-      const state = store.getState().applications;
+      const state = store.getState();
 
-      expect(state.items).toEqual([]);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Failed to fetch applications');
+      expect(state.applications.items).toEqual([]);
+      expect(state.applications.isLoading).toBe(false);
+      expect(state.applications.error).toBe('Failed to fetch applications');
     });
   });
 
@@ -93,11 +97,11 @@ describe('Applications Slice', () => {
       });
 
       await store.dispatch(submitApplication(mockApplication));
-      const state = store.getState().applications;
+      const state = store.getState();
 
-      expect(state.items).toContainEqual(mockResponse);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(state.applications.items).toContainEqual(mockResponse);
+      expect(state.applications.isLoading).toBe(false);
+      expect(state.applications.error).toBeNull();
     });
 
     it('should handle submission failure', async () => {
@@ -106,11 +110,11 @@ describe('Applications Slice', () => {
       });
 
       await store.dispatch(submitApplication(mockApplication));
-      const state = store.getState().applications;
+      const state = store.getState();
 
-      expect(state.items).toEqual([]);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Failed to submit application');
+      expect(state.applications.items).toEqual([]);
+      expect(state.applications.isLoading).toBe(false);
+      expect(state.applications.error).toBe('Failed to submit application');
     });
   });
 
@@ -135,8 +139,8 @@ describe('Applications Slice', () => {
         status: 'accepted',
       }));
 
-      const state = store.getState().applications;
-      const updatedApplication = state.items.find(app => app.id === '1');
+      const state = store.getState();
+      const updatedApplication = state.applications.items.find((app: Application) => app.id === '1');
       expect(updatedApplication?.status).toBe('accepted');
     });
 
@@ -146,33 +150,40 @@ describe('Applications Slice', () => {
         status: 'accepted',
       }));
 
-      const state = store.getState().applications;
-      expect(state.items).toEqual([]);
+      const state = store.getState();
+      expect(state.applications.items).toEqual([]);
     });
   });
 
   describe('Loading States', () => {
     it('should handle loading states for fetch applications', () => {
       store.dispatch({ type: 'applications/fetchApplications/pending' });
-      expect(store.getState().applications.isLoading).toBe(true);
+      const state = store.getState();
+      expect(state.applications.isLoading).toBe(true);
 
       store.dispatch({ type: 'applications/fetchApplications/fulfilled', payload: [] });
-      expect(store.getState().applications.isLoading).toBe(false);
+      const newState = store.getState();
+      expect(newState.applications.isLoading).toBe(false);
     });
 
     it('should handle loading states for submit application', () => {
       store.dispatch({ type: 'applications/submitApplication/pending' });
-      expect(store.getState().applications.isLoading).toBe(true);
+      const state = store.getState();
+      expect(state.applications.isLoading).toBe(true);
 
-      store.dispatch({ type: 'applications/submitApplication/fulfilled', payload: {
-        id: '1',
-        jobId: 'job1',
-        userId: 'user1',
-        status: 'pending',
-        appliedDate: '2024-01-08',
-        resume: 'resume.pdf',
-      }});
-      expect(store.getState().applications.isLoading).toBe(false);
+      store.dispatch({
+        type: 'applications/submitApplication/fulfilled',
+        payload: {
+          id: '1',
+          jobId: 'job1',
+          userId: 'user1',
+          status: 'pending',
+          appliedDate: '2024-01-08',
+          resume: 'resume.pdf',
+        },
+      });
+      const newState = store.getState();
+      expect(newState.applications.isLoading).toBe(false);
     });
   });
 }); 

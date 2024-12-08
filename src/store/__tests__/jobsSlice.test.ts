@@ -5,8 +5,12 @@ import type { Job } from '../slices/jobsSlice';
 // Mock fetch
 global.fetch = jest.fn();
 
+interface TestStore {
+  jobs: ReturnType<typeof jobsReducer>;
+}
+
 describe('Jobs Slice', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: ReturnType<typeof configureStore<TestStore>>;
 
   beforeEach(() => {
     store = configureStore({
@@ -17,8 +21,8 @@ describe('Jobs Slice', () => {
 
   describe('Initial State', () => {
     it('should have the correct initial state', () => {
-      const state = store.getState().jobs;
-      expect(state).toEqual({
+      const state = store.getState();
+      expect(state.jobs).toEqual({
         items: [],
         filters: {
           location: null,
@@ -36,13 +40,24 @@ describe('Jobs Slice', () => {
     const mockJobs: Job[] = [
       {
         id: '1',
-        title: 'Software Engineer',
-        company: 'Tech Corp',
-        location: 'San Francisco',
+        title: 'Frontend Developer',
+        company: 'Tech Co',
+        location: 'New York',
         type: 'full-time',
+        salary: 100000,
+        description: 'Frontend role',
+        requirements: ['React'],
+        postedDate: '2024-01-08',
+      },
+      {
+        id: '2',
+        title: 'Backend Developer',
+        company: 'Tech Co',
+        location: 'Remote',
+        type: 'contract',
         salary: 120000,
-        description: 'Great job opportunity',
-        requirements: ['React', 'Node.js'],
+        description: 'Backend role',
+        requirements: ['Node.js'],
         postedDate: '2024-01-08',
       },
     ];
@@ -54,11 +69,11 @@ describe('Jobs Slice', () => {
       });
 
       await store.dispatch(fetchJobs({}));
-      const state = store.getState().jobs;
+      const state = store.getState();
 
-      expect(state.items).toEqual(mockJobs);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(state.jobs.items).toEqual(mockJobs);
+      expect(state.jobs.isLoading).toBe(false);
+      expect(state.jobs.error).toBeNull();
     });
 
     it('should handle jobs fetch with filters', async () => {
@@ -93,22 +108,22 @@ describe('Jobs Slice', () => {
       });
 
       await store.dispatch(fetchJobs({}));
-      const state = store.getState().jobs;
+      const state = store.getState();
 
-      expect(state.items).toEqual([]);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Failed to fetch jobs');
+      expect(state.jobs.items).toEqual([]);
+      expect(state.jobs.isLoading).toBe(false);
+      expect(state.jobs.error).toBe('Failed to fetch jobs');
     });
 
     it('should handle network error', async () => {
       (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
       await store.dispatch(fetchJobs({}));
-      const state = store.getState().jobs;
+      const state = store.getState();
 
-      expect(state.items).toEqual([]);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Network error');
+      expect(state.jobs.items).toEqual([]);
+      expect(state.jobs.isLoading).toBe(false);
+      expect(state.jobs.error).toBe('Network error');
     });
   });
 
@@ -120,10 +135,10 @@ describe('Jobs Slice', () => {
       };
 
       store.dispatch(setFilters(newFilters));
-      const state = store.getState().jobs;
+      const state = store.getState();
 
-      expect(state.filters).toEqual({
-        ...state.filters,
+      expect(state.jobs.filters).toEqual({
+        ...state.jobs.filters,
         ...newFilters,
       });
     });
@@ -137,9 +152,9 @@ describe('Jobs Slice', () => {
 
       // Then clear them
       store.dispatch(clearFilters());
-      const state = store.getState().jobs;
+      const state = store.getState();
 
-      expect(state.filters).toEqual({
+      expect(state.jobs.filters).toEqual({
         location: null,
         jobType: null,
         salary: null,
@@ -151,15 +166,15 @@ describe('Jobs Slice', () => {
   describe('Loading States', () => {
     it('should set loading state during fetch', () => {
       store.dispatch({ type: 'jobs/fetchJobs/pending' });
-      const loadingState = store.getState().jobs;
-      expect(loadingState.isLoading).toBe(true);
-      expect(loadingState.error).toBeNull();
+      const loadingState = store.getState();
+      expect(loadingState.jobs.isLoading).toBe(true);
+      expect(loadingState.jobs.error).toBeNull();
     });
 
     it('should clear loading state after fetch', () => {
       store.dispatch({ type: 'jobs/fetchJobs/fulfilled', payload: [] });
-      const state = store.getState().jobs;
-      expect(state.isLoading).toBe(false);
+      const state = store.getState();
+      expect(state.jobs.isLoading).toBe(false);
     });
   });
 }); 

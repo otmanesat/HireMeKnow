@@ -1,12 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { loginUser, logout, clearError } from '../slices/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { RootState } from '../store';
 
 // Mock fetch
 global.fetch = jest.fn();
 
+interface TestStore {
+  auth: ReturnType<typeof authReducer>;
+}
+
 describe('Auth Slice', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: ReturnType<typeof configureStore<TestStore>>;
 
   beforeEach(() => {
     store = configureStore({
@@ -18,8 +23,8 @@ describe('Auth Slice', () => {
 
   describe('Initial State', () => {
     it('should have the correct initial state', () => {
-      const state = store.getState().auth;
-      expect(state).toEqual({
+      const state = store.getState();
+      expect(state.auth).toEqual({
         user: null,
         token: null,
         isLoading: false,
@@ -51,12 +56,12 @@ describe('Auth Slice', () => {
       });
 
       await store.dispatch(loginUser(mockCredentials));
-      const state = store.getState().auth;
+      const state = store.getState();
 
-      expect(state.user).toEqual(mockResponse.user);
-      expect(state.token).toBe(mockResponse.token);
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(state.auth.user).toEqual(mockResponse.user);
+      expect(state.auth.token).toBe(mockResponse.token);
+      expect(state.auth.isLoading).toBe(false);
+      expect(state.auth.error).toBeNull();
 
       // Check if token was stored in AsyncStorage
       const storedToken = await AsyncStorage.getItem('token');
@@ -71,12 +76,12 @@ describe('Auth Slice', () => {
       });
 
       await store.dispatch(loginUser(mockCredentials));
-      const state = store.getState().auth;
+      const state = store.getState();
 
-      expect(state.user).toBeNull();
-      expect(state.token).toBeNull();
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Login failed');
+      expect(state.auth.user).toBeNull();
+      expect(state.auth.token).toBeNull();
+      expect(state.auth.isLoading).toBe(false);
+      expect(state.auth.error).toBe('Login failed');
 
       // Check that token was not stored in AsyncStorage
       const storedToken = await AsyncStorage.getItem('token');
@@ -87,12 +92,12 @@ describe('Auth Slice', () => {
       (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
       await store.dispatch(loginUser(mockCredentials));
-      const state = store.getState().auth;
+      const state = store.getState();
 
-      expect(state.user).toBeNull();
-      expect(state.token).toBeNull();
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Network error');
+      expect(state.auth.user).toBeNull();
+      expect(state.auth.token).toBeNull();
+      expect(state.auth.isLoading).toBe(false);
+      expect(state.auth.error).toBe('Network error');
     });
   });
 
@@ -109,11 +114,11 @@ describe('Auth Slice', () => {
       });
 
       store.dispatch(logout());
-      const state = store.getState().auth;
+      const state = store.getState();
 
-      expect(state.user).toBeNull();
-      expect(state.token).toBeNull();
-      expect(state.error).toBeNull();
+      expect(state.auth.user).toBeNull();
+      expect(state.auth.token).toBeNull();
+      expect(state.auth.error).toBeNull();
 
       // Check that token was removed from AsyncStorage
       const storedToken = await AsyncStorage.getItem('token');
@@ -130,9 +135,9 @@ describe('Auth Slice', () => {
       });
 
       store.dispatch(clearError());
-      const state = store.getState().auth;
+      const state = store.getState();
 
-      expect(state.error).toBeNull();
+      expect(state.auth.error).toBeNull();
     });
   });
 }); 

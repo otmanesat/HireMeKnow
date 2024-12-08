@@ -1,4 +1,4 @@
-import { store, persistor } from '../store';
+import { store, persistor, RootState } from '../store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 describe('Store Configuration', () => {
@@ -7,7 +7,7 @@ describe('Store Configuration', () => {
   });
 
   it('should initialize with the correct state structure', () => {
-    const state = store.getState();
+    const state = store.getState() as RootState;
     expect(state).toHaveProperty('auth');
     expect(state).toHaveProperty('jobs');
     expect(state).toHaveProperty('applications');
@@ -15,7 +15,7 @@ describe('Store Configuration', () => {
   });
 
   it('should have the correct initial values', () => {
-    const state = store.getState();
+    const state = store.getState() as RootState;
     
     // Auth state
     expect(state.auth).toEqual({
