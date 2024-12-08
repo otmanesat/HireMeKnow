@@ -25,6 +25,14 @@ jest.mock('@react-navigation/native', () => ({
   }),
 }));
 
+// Mock stack navigator
+jest.mock('@react-navigation/stack', () => ({
+  createStackNavigator: () => ({
+    Navigator: jest.fn(() => null),
+    Screen: jest.fn(() => null),
+  }),
+}));
+
 // Mock gesture handler
 jest.mock('react-native-gesture-handler', () => ({
   GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => children,

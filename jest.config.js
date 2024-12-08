@@ -6,7 +6,7 @@ module.exports = {
     '<rootDir>/jest.setup.js'
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|@rneui|react-native-reanimated)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|@rneui|react-native-reanimated|react-native-size-matters|react-native-gesture-handler)/)',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -38,4 +38,8 @@ module.exports = {
       isolatedModules: true,
     },
   },
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+  },
+  moduleDirectories: ['node_modules', 'src'],
 }; 
