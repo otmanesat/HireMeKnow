@@ -1,0 +1,35 @@
+name: Environment Setup
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  NODE_ENV: production
+  STAGE: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+
+jobs:
+  setup-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Create Environment Files
+        run: |
+          # Backend environment
+          echo "API_URL=${{ secrets.API_URL }}" >> backend/.env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> backend/.env
+          echo "STAGE=${STAGE}" >> backend/.env
+          
+          # Mobile app environment
+          echo "API_URL=${{ secrets.API_URL }}" >> .env
+          echo "FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }}" >> .env
+          echo "STAGE=${STAGE}" >> .env
+          
+      - name: Upload Environment Files
+        uses: actions/upload-artifact@v2
+        with:
+          name: environment-files
+          path: |
+            .env
+            backend/.env 

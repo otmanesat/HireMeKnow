@@ -1,0 +1,60 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday at midnight
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Run SAST
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript, typescript
+          
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        
+      - name: Run Dependency Scan
+        run: |
+          npm audit
+          cd backend && npm audit
+          
+  secrets-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Check for Secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Run License Compliance Check
+        run: |
+          npm install -g license-checker
+          license-checker --summary
+          
+      - name: Check for Security Headers
+        run: |
+          curl -s -I ${{ secrets.API_URL }} | grep -i strict-transport-security
+          curl -s -I ${{ secrets.API_URL }} | grep -i x-content-type-options
+          curl -s -I ${{ secrets.API_URL }} | grep -i x-frame-options 
