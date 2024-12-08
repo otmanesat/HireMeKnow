@@ -20,7 +20,7 @@ export interface JobFilters {
   searchQuery: string;
 }
 
-interface JobsState {
+export interface JobsState {
   items: Job[];
   filters: JobFilters;
   isLoading: boolean;

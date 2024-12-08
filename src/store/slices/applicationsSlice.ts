@@ -12,7 +12,7 @@ export interface Application {
   notes?: string;
 }
 
-interface ApplicationsState {
+export interface ApplicationsState {
   items: Application[];
   isLoading: boolean;
   error: string | null;

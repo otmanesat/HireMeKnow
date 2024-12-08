@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Types
-interface UserPreferences {
+export interface UserPreferences {
   theme: 'light' | 'dark';
   notifications: boolean;
   language: string;
@@ -18,7 +18,7 @@ interface UserPreferences {
   };
 }
 
-interface UserPreferencesState extends UserPreferences {
+export interface UserPreferencesState extends UserPreferences {
   isLoading: boolean;
   error: string | null;
 }
