@@ -12,8 +12,12 @@ import userPreferencesReducer, {
   resetPreferences,
 } from '../slices/userPreferencesSlice';
 
+interface TestStore {
+  userPreferences: ReturnType<typeof userPreferencesReducer>;
+}
+
 describe('User Preferences Slice', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: ReturnType<typeof configureStore<TestStore>>;
 
   beforeEach(() => {
     store = configureStore({
@@ -23,8 +27,8 @@ describe('User Preferences Slice', () => {
 
   describe('Initial State', () => {
     it('should have the correct initial state', () => {
-      const state = store.getState().userPreferences;
-      expect(state).toEqual({
+      const state = store.getState();
+      expect(state.userPreferences).toEqual({
         theme: 'light',
         notifications: true,
         language: 'en',
@@ -84,47 +88,47 @@ describe('User Preferences Slice', () => {
       };
 
       store.dispatch(updateJobAlerts(newAlerts));
-      const state = store.getState().userPreferences.jobAlerts;
+      const state = store.getState();
       
-      expect(state.enabled).toBe(false);
-      expect(state.frequency).toBe('weekly');
+      expect(state.userPreferences.jobAlerts.enabled).toBe(false);
+      expect(state.userPreferences.jobAlerts.frequency).toBe('weekly');
       // Other properties should remain unchanged
-      expect(state.keywords).toEqual([]);
-      expect(state.locations).toEqual([]);
+      expect(state.userPreferences.jobAlerts.keywords).toEqual([]);
+      expect(state.userPreferences.jobAlerts.locations).toEqual([]);
     });
 
     it('should manage keywords', () => {
       store.dispatch(addJobAlertKeyword('react'));
       store.dispatch(addJobAlertKeyword('typescript'));
       
-      let state = store.getState().userPreferences.jobAlerts;
-      expect(state.keywords).toEqual(['react', 'typescript']);
+      let state = store.getState();
+      expect(state.userPreferences.jobAlerts.keywords).toEqual(['react', 'typescript']);
 
       // Should not add duplicate keywords
       store.dispatch(addJobAlertKeyword('react'));
-      state = store.getState().userPreferences.jobAlerts;
-      expect(state.keywords).toEqual(['react', 'typescript']);
+      state = store.getState();
+      expect(state.userPreferences.jobAlerts.keywords).toEqual(['react', 'typescript']);
 
       store.dispatch(removeJobAlertKeyword('react'));
-      state = store.getState().userPreferences.jobAlerts;
-      expect(state.keywords).toEqual(['typescript']);
+      state = store.getState();
+      expect(state.userPreferences.jobAlerts.keywords).toEqual(['typescript']);
     });
 
     it('should manage locations', () => {
       store.dispatch(addJobAlertLocation('New York'));
       store.dispatch(addJobAlertLocation('San Francisco'));
       
-      let state = store.getState().userPreferences.jobAlerts;
-      expect(state.locations).toEqual(['New York', 'San Francisco']);
+      let state = store.getState();
+      expect(state.userPreferences.jobAlerts.locations).toEqual(['New York', 'San Francisco']);
 
       // Should not add duplicate locations
       store.dispatch(addJobAlertLocation('New York'));
-      state = store.getState().userPreferences.jobAlerts;
-      expect(state.locations).toEqual(['New York', 'San Francisco']);
+      state = store.getState();
+      expect(state.userPreferences.jobAlerts.locations).toEqual(['New York', 'San Francisco']);
 
       store.dispatch(removeJobAlertLocation('New York'));
-      state = store.getState().userPreferences.jobAlerts;
-      expect(state.locations).toEqual(['San Francisco']);
+      state = store.getState();
+      expect(state.userPreferences.jobAlerts.locations).toEqual(['San Francisco']);
     });
   });
 
@@ -136,12 +140,12 @@ describe('User Preferences Slice', () => {
       };
 
       store.dispatch(updateDisplaySettings(newSettings));
-      const state = store.getState().userPreferences.displaySettings;
+      const state = store.getState();
       
-      expect(state.compactView).toBe(true);
-      expect(state.showSalary).toBe(false);
+      expect(state.userPreferences.displaySettings.compactView).toBe(true);
+      expect(state.userPreferences.displaySettings.showSalary).toBe(false);
       // Other properties should remain unchanged
-      expect(state.defaultJobSort).toBe('date');
+      expect(state.userPreferences.displaySettings.defaultJobSort).toBe('date');
     });
   });
 
@@ -155,17 +159,17 @@ describe('User Preferences Slice', () => {
 
       // Reset preferences
       store.dispatch(resetPreferences());
-      const state = store.getState().userPreferences;
+      const state = store.getState();
 
       // Check that values are reset
-      expect(state.theme).toBe('light');
-      expect(state.language).toBe('en');
-      expect(state.jobAlerts.keywords).toEqual([]);
-      expect(state.displaySettings.compactView).toBe(false);
+      expect(state.userPreferences.theme).toBe('light');
+      expect(state.userPreferences.language).toBe('en');
+      expect(state.userPreferences.jobAlerts.keywords).toEqual([]);
+      expect(state.userPreferences.displaySettings.compactView).toBe(false);
 
       // Check that loading and error states are preserved
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBeNull();
+      expect(state.userPreferences.isLoading).toBe(false);
+      expect(state.userPreferences.error).toBeNull();
     });
   });
 }); 
