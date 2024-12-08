@@ -6,24 +6,21 @@ import { AppNavigator } from '../AppNavigator';
 import authReducer from '../../store/slices/authSlice';
 
 // Mock the hooks
+const mockUseAuth = jest.fn();
 jest.mock('../../hooks/useAuth', () => ({
-  useAuth: jest.fn(() => ({
-    isAuthenticated: false,
-    user: null,
-    login: jest.fn(),
-    logout: jest.fn(),
-    isLoading: false,
-    error: null,
-  })),
+  useAuth: () => mockUseAuth(),
 }));
 
 // Mock the navigators
+const mockAuthNavigator = jest.fn(() => null);
+const mockMainNavigator = jest.fn(() => null);
+
 jest.mock('../AuthNavigator', () => ({
-  AuthNavigator: jest.fn(() => null),
+  AuthNavigator: mockAuthNavigator,
 }));
 
 jest.mock('../MainNavigator', () => ({
-  MainNavigator: jest.fn(() => null),
+  MainNavigator: mockMainNavigator,
 }));
 
 // Mock navigation
@@ -53,9 +50,6 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// Import the mocked hook
-import { useAuth } from '../../hooks/useAuth';
-
 describe('Navigation System', () => {
   let store;
 
@@ -70,7 +64,7 @@ describe('Navigation System', () => {
 
   describe('Authentication Flow', () => {
     it('shows auth navigator when not authenticated', () => {
-      (useAuth as jest.Mock).mockReturnValue({
+      mockUseAuth.mockReturnValue({
         isAuthenticated: false,
         user: null,
         login: jest.fn(),
@@ -85,11 +79,11 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(require('../AuthNavigator').AuthNavigator).toHaveBeenCalled();
+      expect(mockAuthNavigator).toHaveBeenCalled();
     });
 
     it('shows main navigator when authenticated', () => {
-      (useAuth as jest.Mock).mockReturnValue({
+      mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: { id: '1' },
         login: jest.fn(),
@@ -104,13 +98,13 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(require('../MainNavigator').MainNavigator).toHaveBeenCalled();
+      expect(mockMainNavigator).toHaveBeenCalled();
     });
   });
 
   describe('Role-Based Access', () => {
     it('redirects to jobs list when user lacks required role', () => {
-      (useAuth as jest.Mock).mockReturnValue({
+      mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: { id: '1', role: 'user' },
         login: jest.fn(),
@@ -125,13 +119,13 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(require('../MainNavigator').MainNavigator).toHaveBeenCalled();
+      expect(mockMainNavigator).toHaveBeenCalled();
     });
   });
 
   describe('Navigation State', () => {
     it('maintains navigation state after auth status change', () => {
-      (useAuth as jest.Mock).mockReturnValue({
+      mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         user: { id: '1' },
         login: jest.fn(),
@@ -146,7 +140,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      (useAuth as jest.Mock).mockReturnValue({
+      mockUseAuth.mockReturnValue({
         isAuthenticated: false,
         user: null,
         login: jest.fn(),
@@ -161,7 +155,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(require('../AuthNavigator').AuthNavigator).toHaveBeenCalled();
+      expect(mockAuthNavigator).toHaveBeenCalled();
     });
   });
 }); 
