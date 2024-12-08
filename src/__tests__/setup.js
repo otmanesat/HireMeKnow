@@ -35,4 +35,11 @@ jest.mock('@react-navigation/native', () => ({
   useRoute: () => ({
     params: {},
   }),
-})); 
+}));
+
+describe('Test Environment Setup', () => {
+  it('should have required environment variables', () => {
+    expect(process.env.NODE_ENV).toBe('test');
+    expect(process.env.API_URL).toBe('http://localhost:3000');
+  });
+}); 

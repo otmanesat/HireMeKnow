@@ -6,14 +6,26 @@ register({
   baseUrl: './src',
   paths: {
     '@core/*': ['core/*'],
-    '@infrastructure/*': ['infrastructure/*'],
     '@services/*': ['services/*'],
-    '@utils/*': ['utils/*']
-  }
+    '@infrastructure/*': ['infrastructure/*'],
+  },
 });
 
-// Load test environment variables
-dotenv.config({ path: '.env.test' });
+// Load environment variables
+dotenv.config();
+
+describe('Backend Test Environment Setup', () => {
+  it('should have TypeScript path aliases configured', () => {
+    expect(() => require('@core/interfaces/database.interface')).not.toThrow();
+    expect(() => require('@services/user.service')).not.toThrow();
+    expect(() => require('@infrastructure/database.factory')).not.toThrow();
+  });
+
+  it('should have required environment variables', () => {
+    expect(process.env.NODE_ENV).toBe('test');
+    expect(process.env.DATABASE_URL).toBeDefined();
+  });
+});
 
 // Set test environment
 process.env.NODE_ENV = 'test';

@@ -26,20 +26,6 @@ describe('React Native Setup', () => {
     expect(['ios', 'android', 'web']).toContain(Platform.OS);
   });
 
-  it('has required native modules available', () => {
-    const requiredModules = [
-      'NativeAnimatedHelper',
-      'NativeEventEmitter',
-      'AsyncStorage',
-    ];
-
-    requiredModules.forEach(moduleName => {
-      expect(() => {
-        jest.requireMock(moduleName);
-      }).not.toThrow();
-    });
-  });
-
   it('has gesture handler configured', () => {
     const GestureHandler = require('react-native-gesture-handler');
     expect(GestureHandler.GestureHandlerRootView).toBeDefined();

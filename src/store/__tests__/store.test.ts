@@ -1,7 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import rootReducer from '../store';
+import authReducer from '../slices/authSlice';
+import jobsReducer from '../slices/jobsSlice';
+import applicationsReducer from '../slices/applicationsSlice';
+import userPreferencesReducer from '../slices/userPreferencesSlice';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: jest.fn(() => Promise.resolve()),
@@ -19,7 +22,12 @@ describe('Store Configuration', () => {
 
   it('should create store with initial state', () => {
     const store = configureStore({
-      reducer: rootReducer,
+      reducer: {
+        auth: authReducer,
+        jobs: jobsReducer,
+        applications: applicationsReducer,
+        userPreferences: userPreferencesReducer,
+      },
     });
 
     const state = store.getState();
@@ -34,6 +42,13 @@ describe('Store Configuration', () => {
       key: 'root',
       storage: AsyncStorage,
       whitelist: ['auth', 'userPreferences'],
+    };
+
+    const rootReducer = {
+      auth: authReducer,
+      jobs: jobsReducer,
+      applications: applicationsReducer,
+      userPreferences: userPreferencesReducer,
     };
 
     const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -59,7 +74,12 @@ describe('Store Configuration', () => {
 
   it('should handle middleware configuration', () => {
     const store = configureStore({
-      reducer: rootReducer,
+      reducer: {
+        auth: authReducer,
+        jobs: jobsReducer,
+        applications: applicationsReducer,
+        userPreferences: userPreferencesReducer,
+      },
       middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
           serializableCheck: {
