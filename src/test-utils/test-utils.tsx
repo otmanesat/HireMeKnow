@@ -6,8 +6,12 @@ import { configureStore } from '@reduxjs/toolkit';
 import { ThemeProvider } from '@rneui/themed';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// Import root reducer
+// Import root reducer and store
 import { store as realStore } from '../store/store';
+import authReducer from '../store/slices/authSlice';
+import jobsReducer from '../store/slices/jobsSlice';
+import applicationsReducer from '../store/slices/applicationsSlice';
+import userPreferencesReducer from '../store/slices/userPreferencesSlice';
 import type { RootState } from '../store/store';
 
 interface WrapperProps {
@@ -23,7 +27,12 @@ interface RenderOptions {
 
 export const createTestStore = (preloadedState: Partial<RootState> = {}) => {
   return configureStore({
-    reducer: realStore.getState(),
+    reducer: {
+      auth: authReducer,
+      jobs: jobsReducer,
+      applications: applicationsReducer,
+      userPreferences: userPreferencesReducer,
+    },
     preloadedState: preloadedState as any,
   });
 };
