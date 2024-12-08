@@ -3,9 +3,19 @@ import { render } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { AppNavigator } from '../AppNavigator';
+import authReducer from '../../store/slices/authSlice';
 
 // Mock the hooks
-jest.mock('../../hooks/useAuth');
+jest.mock('../../hooks/useAuth', () => ({
+  useAuth: jest.fn(() => ({
+    isAuthenticated: false,
+    user: null,
+    login: jest.fn(),
+    logout: jest.fn(),
+    isLoading: false,
+    error: null,
+  })),
+}));
 
 // Mock the navigators
 jest.mock('../AuthNavigator', () => ({
@@ -46,21 +56,21 @@ jest.mock('react-native-safe-area-context', () => ({
 // Import the mocked hook
 import { useAuth } from '../../hooks/useAuth';
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-
 describe('Navigation System', () => {
   let store;
 
   beforeEach(() => {
     store = configureStore({
-      reducer: {},
+      reducer: {
+        auth: authReducer,
+      },
     });
     jest.clearAllMocks();
   });
 
   describe('Authentication Flow', () => {
     it('shows auth navigator when not authenticated', () => {
-      mockUseAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: false,
         user: null,
         login: jest.fn(),
@@ -79,7 +89,7 @@ describe('Navigation System', () => {
     });
 
     it('shows main navigator when authenticated', () => {
-      mockUseAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: true,
         user: { id: '1' },
         login: jest.fn(),
@@ -100,7 +110,7 @@ describe('Navigation System', () => {
 
   describe('Role-Based Access', () => {
     it('redirects to jobs list when user lacks required role', () => {
-      mockUseAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: true,
         user: { id: '1', role: 'user' },
         login: jest.fn(),
@@ -121,7 +131,7 @@ describe('Navigation System', () => {
 
   describe('Navigation State', () => {
     it('maintains navigation state after auth status change', () => {
-      mockUseAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: true,
         user: { id: '1' },
         login: jest.fn(),
@@ -136,7 +146,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      mockUseAuth.mockReturnValue({
+      (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: false,
         user: null,
         login: jest.fn(),
