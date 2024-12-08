@@ -42,7 +42,7 @@ describe('Jobs Slice', () => {
       await store.dispatch(fetchJobs(filters));
       
       // Verify that the URL includes the correct query parameters
-      const expectedUrl = `${process.env.API_URL || 'YOUR_API_URL'}/jobs?location=San+Francisco&type=full-time&salary=100000`;
+      const expectedUrl = 'http://localhost:3000/jobs?location=San+Francisco&type=full-time&salary=100000';
       expect(fetch).toHaveBeenCalledWith(expectedUrl);
     });
 

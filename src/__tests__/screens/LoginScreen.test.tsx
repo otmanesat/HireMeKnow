@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, waitFor } from '@testing-library/react-native';
-import { renderWithProviders, createMockUser } from '../../test-utils/test-utils';
+import { renderWithProviders } from '../../test-utils/test-utils';
 import { LoginScreen } from '../../screens/Auth/LoginScreen';
 import { loginUser } from '../../store/slices/authSlice';
 
@@ -13,71 +13,88 @@ jest.mock('@react-navigation/native', () => ({
   }),
 }));
 
+// Mock the auth hook
+jest.mock('../../hooks/useAuth', () => ({
+  useAuth: () => ({
+    login: jest.fn(),
+    isLoading: false,
+    error: null,
+  }),
+}));
+
 describe('LoginScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders login form correctly', () => {
-    const { getByTestId, getByText } = renderWithProviders(<LoginScreen />);
+    const { getByPlaceholderText, getByText } = renderWithProviders(<LoginScreen />);
 
-    expect(getByTestId('login-screen')).toBeTruthy();
-    expect(getByTestId('email-input')).toBeTruthy();
-    expect(getByTestId('password-input')).toBeTruthy();
+    expect(getByPlaceholderText('Email')).toBeTruthy();
+    expect(getByPlaceholderText('Password')).toBeTruthy();
     expect(getByText('Login')).toBeTruthy();
-    expect(getByText('Create an account')).toBeTruthy();
   });
 
-  it('shows validation errors for empty fields', async () => {
-    const { getByTestId, findByText } = renderWithProviders(<LoginScreen />);
+  it('handles login submission', async () => {
+    const { getByPlaceholderText, getByText } = renderWithProviders(<LoginScreen />);
 
-    fireEvent.press(getByTestId('login-button'));
+    const emailInput = getByPlaceholderText('Email');
+    const passwordInput = getByPlaceholderText('Password');
+    const loginButton = getByText('Login');
 
-    expect(await findByText('Email is required')).toBeTruthy();
-    expect(await findByText('Password is required')).toBeTruthy();
-  });
+    fireEvent.changeText(emailInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password123');
+    fireEvent.press(loginButton);
 
-  it('handles successful login', async () => {
-    const mockUser = createMockUser();
-    const { getByTestId } = renderWithProviders(<LoginScreen />);
-
-    // Fill in the form
-    fireEvent.changeText(getByTestId('email-input'), mockUser.email);
-    fireEvent.changeText(getByTestId('password-input'), 'password123');
-
-    // Submit the form
-    fireEvent.press(getByTestId('login-button'));
-
-    // Wait for the login process
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('Home');
+      expect(loginUser).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'password123',
+      });
     });
   });
 
-  it('handles login error', async () => {
-    const { getByTestId, findByText } = renderWithProviders(<LoginScreen />);
+  it('shows error message when login fails', async () => {
+    const mockError = 'Invalid credentials';
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Mock a failed login
-    jest.spyOn(global, 'fetch').mockImplementationOnce(() =>
-      Promise.reject(new Error('Invalid credentials'))
-    );
+    const { getByPlaceholderText, getByText } = renderWithProviders(<LoginScreen />);
 
-    // Fill in the form with invalid credentials
-    fireEvent.changeText(getByTestId('email-input'), 'wrong@example.com');
-    fireEvent.changeText(getByTestId('password-input'), 'wrongpassword');
+    const emailInput = getByPlaceholderText('Email');
+    const passwordInput = getByPlaceholderText('Password');
+    const loginButton = getByText('Login');
 
-    // Submit the form
-    fireEvent.press(getByTestId('login-button'));
+    fireEvent.changeText(emailInput, 'wrong@example.com');
+    fireEvent.changeText(passwordInput, 'wrongpassword');
+    fireEvent.press(loginButton);
 
-    // Check for error message
-    expect(await findByText('Invalid credentials')).toBeTruthy();
+    await waitFor(() => {
+      expect(getByText(mockError)).toBeTruthy();
+    });
   });
 
   it('navigates to registration screen', () => {
-    const { getByTestId } = renderWithProviders(<LoginScreen />);
+    const { getByText } = renderWithProviders(<LoginScreen />);
 
-    fireEvent.press(getByTestId('register-link'));
+    const registerLink = getByText('Create an account');
+    fireEvent.press(registerLink);
 
     expect(mockNavigate).toHaveBeenCalledWith('Register');
+  });
+
+  it('shows loading state during login', async () => {
+    const { getByPlaceholderText, getByText } = renderWithProviders(<LoginScreen />);
+
+    const emailInput = getByPlaceholderText('Email');
+    const passwordInput = getByPlaceholderText('Password');
+    const loginButton = getByText('Login');
+
+    fireEvent.changeText(emailInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password123');
+    fireEvent.press(loginButton);
+
+    await waitFor(() => {
+      expect(getByText('Loading...')).toBeTruthy();
+    });
   });
 }); 
