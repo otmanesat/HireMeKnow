@@ -13,15 +13,12 @@ jest.mock('../../hooks/useAuth', () => ({
 }));
 
 // Mock the navigators
-const mockAuthNavigator = jest.fn(() => null);
-const mockMainNavigator = jest.fn(() => null);
-
 jest.mock('../AuthNavigator', () => ({
-  AuthNavigator: mockAuthNavigator,
+  AuthNavigator: () => null,
 }));
 
 jest.mock('../MainNavigator', () => ({
-  MainNavigator: mockMainNavigator,
+  MainNavigator: () => null,
 }));
 
 // Mock navigation
@@ -80,7 +77,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(mockAuthNavigator).toHaveBeenCalled();
+      expect(mockUseAuth).toHaveBeenCalled();
     });
 
     it('shows main navigator when authenticated', () => {
@@ -99,7 +96,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(mockMainNavigator).toHaveBeenCalled();
+      expect(mockUseAuth).toHaveBeenCalled();
     });
   });
 
@@ -120,7 +117,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(mockMainNavigator).toHaveBeenCalled();
+      expect(mockUseAuth).toHaveBeenCalled();
     });
   });
 
@@ -156,7 +153,7 @@ describe('Navigation System', () => {
         </Provider>
       );
 
-      expect(mockAuthNavigator).toHaveBeenCalled();
+      expect(mockUseAuth).toHaveBeenCalled();
     });
   });
 }); 

@@ -10,10 +10,12 @@ const HomeScreen: React.FC = () => (
   </View>
 );
 
-export const MainNavigator: React.FC = () => {
+const MainNavigator: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} />
     </Stack.Navigator>
   );
-}; 
+};
+
+export { MainNavigator }; 
