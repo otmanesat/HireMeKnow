@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { ThemeProvider } from '@rneui/themed';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -25,14 +25,16 @@ interface RenderOptions {
   navigationState?: object;
 }
 
+const rootReducer = combineReducers({
+  auth: authReducer,
+  jobs: jobsReducer,
+  applications: applicationsReducer,
+  userPreferences: userPreferencesReducer,
+});
+
 export const createTestStore = (preloadedState: Partial<RootState> = {}) => {
   return configureStore({
-    reducer: {
-      auth: authReducer,
-      jobs: jobsReducer,
-      applications: applicationsReducer,
-      userPreferences: userPreferencesReducer,
-    },
+    reducer: rootReducer,
     preloadedState: preloadedState as any,
   });
 };
